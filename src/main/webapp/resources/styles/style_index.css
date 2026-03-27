@@ -1,0 +1,154 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* новая палитра */
+    --c-bg: #81D8D0;     /* голубой фон */
+    --c-light: #E6CFDC;  /* розовый акцент */
+    --c-ruby: #8C3F5F;   /* глубокий рубиновый */
+    --c-dark: #330819;   /* тёмный фиолетовый */
+    --c-white: #ffffff;  /* белый */
+
+    --index: calc(1vw + 1vh);
+}
+
+
+@font-face {
+    font-family: 'RalewayCustom';
+    src: url("../fonts/raleway-regular.woff2");
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'RalewayCustom';
+    src: url("../fonts/raleway-black.woff2");
+    font-weight: 900;
+}
+
+
+
+body {
+    min-height: 100vh;
+    background-color: var(--c-bg);
+    color: var(--c-dark);
+    font-family: 'RalewayCustom', sans-serif;
+    overflow-x: hidden;
+}
+
+
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 2rem;
+}
+
+.logo {
+    color: var(--dark-blue);
+    font-size: 1.5rem;
+    font-weight: bold;
+    font-style: italic;
+    padding: 0 2rem;
+}
+
+
+
+.nav-items {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--c-dark);
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: 0.25s ease;
+}
+
+.nav-link:hover {
+    background-color: var(--c-light);
+    color: var(--c-dark);
+}
+
+
+
+.clockpage {
+    margin: 0 auto;
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--c-white);
+
+
+    text-shadow: 0 0 18px var(--c-ruby), 0 0 28px var(--c-dark);
+}
+
+#dayOfWeek {
+    display: block;
+    margin-top: 0.3rem;
+    font-weight: 400;
+    font-size: 20px;
+    color: var(--c-dark);
+}
+
+
+
+.hero {
+    margin-top: 3rem;
+    padding: 0 2rem;
+}
+
+.hero-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.column-left h1 {
+    font-size: 2.6rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    color: var(--c-dark);
+}
+
+.column-left p {
+    font-size: 1.2rem;
+    color: var(--c-ruby);
+    margin-bottom: 2rem;
+}
+
+
+
+.start_button {
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    border-radius: 999px;
+    background-color: var(--c-ruby);
+    border: 2px solid var(--c-dark);
+    color: var(--c-white);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.start_button:hover {
+    background-color: var(--c-light);
+    color: var(--c-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+
+
+@media (max-width: 900px) {
+    nav {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+}

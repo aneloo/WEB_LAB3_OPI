@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <title>Лабораторная работа №3</title>
+
+    <meta name="author" content="Volnova Anna"/>
+    <meta name="description" content="Third lab work for web-programming"/>
+
+
+    <h:outputStylesheet library="styles" name="style_main.css"/>
+
+
+    <h:outputScript library="scripts" name="render/render.js"/>
+</h:head>
+
+<h:body onload="firstUpdateList()">
+
+
+    <nav>
+        <div class="logo">Вольнова Анна P3219. Вариант 5427</div>
+
+        <div class="nav-items">
+            <h:link outcome="toIndex" styleClass="nav-link">Home</h:link>
+        </div>
+    </nav>
+
+
+    <main class="main-layout">
+
+
+        <h:form id="form">
+
+
+            <section id="data-container">
+
+
+                <div class="card card-form">
+                    <h2 class="card-title">Ввод данных</h2>
+
+
+                    <div id="Y">
+                        Введите Y [-5; 5]:
+                        <br/>
+                        <h:inputText id="Y-value"
+                                     styleClass="y-value"
+                                     value="#{dotBean.dot.y}"
+                                     required="true"
+                                     maxlength="7"
+                                     converterMessage="Введите число">
+                            <f:validateDoubleRange minimum="-5" maximum="5"/>
+                            <f:ajax render="Y-value-message"/>
+                        </h:inputText>
+                        <h:message id="Y-value-message"
+                                   for="Y-value"
+                                   styleClass="validationInfo"/>
+                    </div>
+
+
+                    <div id="X">
+                        Выберите X [-2; 2]:
+                        <br/>
+                        <h:panelGroup>
+
+                            <h:inputText id="xInput"
+                                         value="#{dotBean.dot.x}"
+                                         style="width:60px"/>
+                            <br/>
+                            <p:slider for="xInput"
+                                      minValue="-2"
+                                      maxValue="2"
+                                      step="0.5"
+                                      display="xInput"
+                                      style="width:260px"/>
+                        </h:panelGroup>
+                    </div>
+
+
+                    <div id="R">
+                        Выберите R [1; 4]:
+                        <br/>
+                        <h:panelGroup>
+                            <h:inputText id="rInput"
+                                         value="#{dotBean.dot.r}"
+                                         style="width:60px"/>
+                            <br/>
+                            <p:slider for="rInput"
+                                      minValue="1"
+                                      maxValue="4"
+                                      step="0.5"
+                                      display="rInput"
+                                      style="width:260px"
+                                      onSlideEnd="updateR()"/>
+                        </h:panelGroup>
+                    </div>
+                </div>
+
+
+                <div class="card card-canvas">
+                    <h2 class="card-title">График области</h2>
+                    <canvas id="canvas" width="400" height="240"></canvas>
+                    <div id="validation-info" class="validationInfo"></div>
+                </div>
+
+            </section>
+
+
+            <section id="table-container" class="card card-table">
+                <h2 class="card-title">Результаты проверок</h2>
+
+                <div id="button-container">
+
+
+                    <h:commandButton id="check"
+                                     value="Проверить"
+                                     styleClass="button"
+                                     action="#{dotBean.add()}">
+                        <f:ajax execute="@form"
+                                render=":results :hiddenForm"
+                                onevent="if (event.status === 'success') { firstUpdateList(); convertTimesToLocal(); }"/>
+                    </h:commandButton>
+
+                    <h:commandButton id="clear"
+                                     value="Очистить"
+                                     styleClass="button"
+                                     action="#{dotBean.clear()}">
+                        <f:ajax execute="@this"
+                                render=":results :hiddenForm"
+                                onevent="if (event.status === 'success') { firstUpdateList(); convertTimesToLocal(); }"/>
+                    </h:commandButton>
+                </div>
+
+                <h:panelGroup id="results">
+                    <h:dataTable value="#{dotBean.dotsList}"
+                                 var="dot"
+                                 styleClass="table"
+                                 id="resultsTable">
+
+                        <h:column>
+                            <f:facet name="header">X</f:facet>
+                            #{dot.x}
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Y</f:facet>
+                            #{dot.y}
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">R</f:facet>
+                            #{dot.r}
+                        </h:column>
+                        <h:column>
+                            <span class="time-cell">#{dot.time}</span>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Мкс</f:facet>
+                            #{dot.scriptTime}
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Результат</f:facet>
+                            #{dot.status}
+                        </h:column>
+
+                    </h:dataTable>
+                </h:panelGroup>
+            </section>
+
+        </h:form>
+
+    </main>
+
+
+    <h:form id="hiddenForm">
+        <h:inputHidden id="xValue" value="#{dotBean.dot.x}"/>
+        <h:inputHidden id="yValue" value="#{dotBean.dot.y}"/>
+        <h:inputHidden id="rValue" value="#{dotBean.dot.r}"/>
+        <h:inputHidden id="dots"  value="#{dotBean.dotsJson}"/>
+
+        <h:commandButton id="checkCanvas"
+                         value="Проверить"
+                         style="display:none"
+                         action="#{dotBean.add()}">
+            <f:ajax execute="hiddenForm"
+                    render=":results :hiddenForm"
+                    onevent="if (event.status === 'success') { firstUpdateList(); }"/>
+        </h:commandButton>
+    </h:form>
+
+    <!-- обновление R  -->
+    <h:outputScript>
+        //<![CDATA[
+        function updateR() {
+            var rInput  = document.getElementById("form:rInput");
+            var rHidden = document.getElementById("hiddenForm:rValue");
+
+            var r = (rInput && rInput.value) ? rInput.value : 2;
+
+            if (rHidden) {
+                rHidden.value = r;
+            }
+            if (typeof draw === "function") {
+                draw(r);
+            }
+        }
+        //]]>
+    </h:outputScript>
+
+    <!--  отрисовка  -->
+    <h:outputScript>
+        //<![CDATA[
+        function firstUpdateList() {
+            var dotsEl = document.getElementById("hiddenForm:dots");
+            var rEl    = document.getElementById("hiddenForm:rValue");
+
+            var json = (dotsEl && dotsEl.value) ? dotsEl.value : "[]";
+            var points;
+            try {
+                points = JSON.parse(json);
+            } catch (e) {
+                console.error("Ошибка парсинга dotsJson:", e);
+                points = [];
+            }
+
+            var r = (rEl && rEl.value) ? rEl.value : 2;
+            if (typeof draw === "function") {
+                draw(r, points);
+            }
+        }
+        //]]>
+    </h:outputScript>
+
+    <!-- клик по графику  -->
+    <h:outputScript>
+        //<![CDATA[
+        function sendData(x, y) {
+            document.getElementById("hiddenForm:xValue").value = x;
+            document.getElementById("hiddenForm:yValue").value = y;
+
+            var rInput = document.getElementById("form:rInput");
+            if (rInput) {
+                document.getElementById("hiddenForm:rValue").value = rInput.value;
+            }
+
+            var checkBtn = document.getElementById("hiddenForm:checkCanvas");
+            if (checkBtn) {
+                checkBtn.click();
+            }
+        }
+        //]]>
+    </h:outputScript>
+
+    <h:outputScript>
+        //<![CDATA[
+        function convertTimesToLocal() {
+            const cells = document.querySelectorAll(".time-cell");
+            cells.forEach(cell => {
+                const iso = cell.textContent.trim();
+                if (!iso) return;
+
+                const d = new Date(iso);
+                if (isNaN(d.getTime())) {
+                    console.error("Невозможно распарсить дату:", iso);
+                    return;
+                }
+
+
+                cell.textContent = d.toLocaleString();
+
+            });
+        }
+
+
+        document.addEventListener("DOMContentLoaded", convertTimesToLocal);
+        //]]>
+    </h:outputScript>
+
+</h:body>
+</html>

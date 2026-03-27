@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<h:head>
+    <title>Лабораторная работа №3</title>
+
+    <meta name="author" content="Volnova Anna"/>
+    <meta name="description" content="Third lab work for web-programming"/>
+
+
+    <h:outputStylesheet library="styles" name="style_index.css"/>
+
+
+    <h:outputScript library="scripts" name="clock.js"/>
+</h:head>
+
+<h:body>
+
+    <nav>
+        <div class="logo">Вольнова Анна P3219. Вариант 5467</div>
+
+    </nav>
+
+    <div class="clockpage">
+        <div id="clock"></div>
+        <div id="dayOfWeek"></div>
+    </div>
+
+    <section class="hero">
+        <div class="hero-container">
+            <div class="column-left">
+                <h1>Проверьте точку на попадание в заданную область</h1>
+
+                <h:button styleClass="start_button"
+                          outcome="toMain"
+                          value="Проверить"/>
+            </div>
+        </div>
+    </section>
+
+</h:body>
+</html>
