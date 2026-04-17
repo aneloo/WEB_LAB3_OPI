@@ -85,14 +85,12 @@ public class DotBean implements Serializable {
                 .collect(java.util.stream.Collectors.joining(",", "[", "]"));
     }
 
-    /**
-     <h:inputHidden value="#{dotBean.dotsJson}">.
 
     public void setDotsJson(String ignored) {
 
-    }
-     */
+        // JSF setter
 
+    }
 
     private void refreshDots() {
         dotsList = dotService.getAllDots();

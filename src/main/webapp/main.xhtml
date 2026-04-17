@@ -12,15 +12,11 @@
     <meta name="author" content="Volnova Anna"/>
     <meta name="description" content="Third lab work for web-programming"/>
 
-
     <h:outputStylesheet library="styles" name="style_main.css"/>
-
-
     <h:outputScript library="scripts" name="render/render.js"/>
 </h:head>
 
 <h:body onload="firstUpdateList()">
-
 
     <nav>
         <div class="logo">Вольнова Анна P3219. Вариант 5427</div>
@@ -30,19 +26,14 @@
         </div>
     </nav>
 
-
     <main class="main-layout">
-
 
         <h:form id="form">
 
-
             <section id="data-container">
-
 
                 <div class="card card-form">
                     <h2 class="card-title">Ввод данных</h2>
-
 
                     <div id="Y">
                         Введите Y [-5; 5]:
@@ -51,8 +42,10 @@
                                      styleClass="y-value"
                                      value="#{dotBean.dot.y}"
                                      required="true"
+                                     requiredMessage="Y обязателен"
                                      maxlength="7"
-                                     converterMessage="Введите число">
+                                     converterMessage="Введите число"
+                                     validatorMessage="Y должен быть от -5 до 5">
                             <f:validateDoubleRange minimum="-5" maximum="5"/>
                             <f:ajax render="Y-value-message"/>
                         </h:inputText>
@@ -61,12 +54,10 @@
                                    styleClass="validationInfo"/>
                     </div>
 
-
-                    <div id="X">
+                    <div id="X" style="margin-top: 28px;">
                         Выберите X [-2; 2]:
                         <br/>
                         <h:panelGroup>
-
                             <h:inputText id="xInput"
                                          value="#{dotBean.dot.x}"
                                          style="width:60px"/>
@@ -80,8 +71,7 @@
                         </h:panelGroup>
                     </div>
 
-
-                    <div id="R">
+                    <div id="R" style="margin-top: 28px;">
                         Выберите R [1; 4]:
                         <br/>
                         <h:panelGroup>
@@ -100,7 +90,6 @@
                     </div>
                 </div>
 
-
                 <div class="card card-canvas">
                     <h2 class="card-title">График области</h2>
                     <canvas id="canvas" width="400" height="240"></canvas>
@@ -109,13 +98,12 @@
 
             </section>
 
+            <section id="table-container"
+                     class="card card-table"
+                     style="margin-top: 24px; padding-top: 18px;">
+                <h2 class="card-title" style="margin-bottom: 18px;">Результаты проверок</h2>
 
-            <section id="table-container" class="card card-table">
-                <h2 class="card-title">Результаты проверок</h2>
-
-                <div id="button-container">
-
-
+                <div id="button-container" style="margin-bottom: 20px;">
                     <h:commandButton id="check"
                                      value="Проверить"
                                      styleClass="button"
@@ -135,7 +123,7 @@
                     </h:commandButton>
                 </div>
 
-                <h:panelGroup id="results">
+                <h:panelGroup id="results" layout="block" style="margin-top: 10px;">
                     <h:dataTable value="#{dotBean.dotsList}"
                                  var="dot"
                                  styleClass="table"
@@ -154,6 +142,7 @@
                             #{dot.r}
                         </h:column>
                         <h:column>
+                            <f:facet name="header">Время</f:facet>
                             <span class="time-cell">#{dot.time}</span>
                         </h:column>
                         <h:column>
@@ -173,12 +162,11 @@
 
     </main>
 
-
     <h:form id="hiddenForm">
         <h:inputHidden id="xValue" value="#{dotBean.dot.x}"/>
         <h:inputHidden id="yValue" value="#{dotBean.dot.y}"/>
         <h:inputHidden id="rValue" value="#{dotBean.dot.r}"/>
-        <h:inputHidden id="dots"  value="#{dotBean.dotsJson}"/>
+        <h:inputHidden id="dots" value="#{dotBean.dotsJson}"/>
 
         <h:commandButton id="checkCanvas"
                          value="Проверить"
@@ -186,15 +174,14 @@
                          action="#{dotBean.add()}">
             <f:ajax execute="hiddenForm"
                     render=":results :hiddenForm"
-                    onevent="if (event.status === 'success') { firstUpdateList(); }"/>
+                    onevent="if (event.status === 'success') { firstUpdateList(); convertTimesToLocal(); }"/>
         </h:commandButton>
     </h:form>
 
-    <!-- обновление R  -->
     <h:outputScript>
         //<![CDATA[
         function updateR() {
-            var rInput  = document.getElementById("form:rInput");
+            var rInput = document.getElementById("form:rInput");
             var rHidden = document.getElementById("hiddenForm:rValue");
 
             var r = (rInput && rInput.value) ? rInput.value : 2;
@@ -209,12 +196,11 @@
         //]]>
     </h:outputScript>
 
-    <!--  отрисовка  -->
     <h:outputScript>
         //<![CDATA[
         function firstUpdateList() {
             var dotsEl = document.getElementById("hiddenForm:dots");
-            var rEl    = document.getElementById("hiddenForm:rValue");
+            var rEl = document.getElementById("hiddenForm:rValue");
 
             var json = (dotsEl && dotsEl.value) ? dotsEl.value : "[]";
             var points;
@@ -233,7 +219,6 @@
         //]]>
     </h:outputScript>
 
-    <!-- клик по графику  -->
     <h:outputScript>
         //<![CDATA[
         function sendData(x, y) {
@@ -267,12 +252,9 @@
                     return;
                 }
 
-
                 cell.textContent = d.toLocaleString();
-
             });
         }
-
 
         document.addEventListener("DOMContentLoaded", convertTimesToLocal);
         //]]>
