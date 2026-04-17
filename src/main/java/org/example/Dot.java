@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Locale;
+import java.util.ResourceBundle;
 
 @Getter
 @Setter
@@ -36,7 +36,9 @@ public class Dot implements Serializable {
     private long scriptTime;
 
     public String getStatus() {
-        return status ? "Да!" : "Нет!";
+        ResourceBundle bundle = ResourceBundle.getBundle("messages");
+        return status
+                ? bundle.getString("status.hit")
+                : bundle.getString("status.miss");
     }
-
 }

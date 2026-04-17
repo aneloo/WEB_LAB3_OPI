@@ -5,9 +5,11 @@
       xmlns:f="jakarta.faces.core"
       xmlns:p="http://primefaces.org/ui">
 
+<f:loadBundle basename="messages" var="msg"/>
+
 <h:head>
     <meta charset="UTF-8"/>
-    <title>Лабораторная работа №3</title>
+    <title>#{msg['page.title']}</title>
 
     <meta name="author" content="Volnova Anna"/>
     <meta name="description" content="Third lab work for web-programming"/>
@@ -22,7 +24,7 @@
         <div class="logo">Вольнова Анна P3219. Вариант 5427</div>
 
         <div class="nav-items">
-            <h:link outcome="toIndex" styleClass="nav-link">Home</h:link>
+            <h:link outcome="toIndex" styleClass="nav-link">#{msg['home']}</h:link>
         </div>
     </nav>
 
@@ -33,19 +35,19 @@
             <section id="data-container">
 
                 <div class="card card-form">
-                    <h2 class="card-title">Ввод данных</h2>
+                    <h2 class="card-title">#{msg['form.title']}</h2>
 
                     <div id="Y">
-                        Введите Y [-5; 5]:
+                        #{msg['y.label']}
                         <br/>
                         <h:inputText id="Y-value"
                                      styleClass="y-value"
                                      value="#{dotBean.dot.y}"
                                      required="true"
-                                     requiredMessage="Y обязателен"
+                                     requiredMessage="#{msg['y.required']}"
                                      maxlength="7"
-                                     converterMessage="Введите число"
-                                     validatorMessage="Y должен быть от -5 до 5">
+                                     converterMessage="#{msg['y.number']}"
+                                     validatorMessage="#{msg['y.range']}">
                             <f:validateDoubleRange minimum="-5" maximum="5"/>
                             <f:ajax render="Y-value-message"/>
                         </h:inputText>
@@ -55,7 +57,7 @@
                     </div>
 
                     <div id="X" style="margin-top: 28px;">
-                        Выберите X [-2; 2]:
+                        #{msg['x.label']}
                         <br/>
                         <h:panelGroup>
                             <h:inputText id="xInput"
@@ -72,7 +74,7 @@
                     </div>
 
                     <div id="R" style="margin-top: 28px;">
-                        Выберите R [1; 4]:
+                        #{msg['r.label']}
                         <br/>
                         <h:panelGroup>
                             <h:inputText id="rInput"
@@ -91,7 +93,7 @@
                 </div>
 
                 <div class="card card-canvas">
-                    <h2 class="card-title">График области</h2>
+                    <h2 class="card-title">#{msg['graph.title']}</h2>
                     <canvas id="canvas" width="400" height="240"></canvas>
                     <div id="validation-info" class="validationInfo"></div>
                 </div>
@@ -101,11 +103,11 @@
             <section id="table-container"
                      class="card card-table"
                      style="margin-top: 24px; padding-top: 18px;">
-                <h2 class="card-title" style="margin-bottom: 18px;">Результаты проверок</h2>
+                <h2 class="card-title" style="margin-bottom: 18px;">#{msg['results.title']}</h2>
 
                 <div id="button-container" style="margin-bottom: 20px;">
                     <h:commandButton id="check"
-                                     value="Проверить"
+                                     value="#{msg['button.check']}"
                                      styleClass="button"
                                      action="#{dotBean.add()}">
                         <f:ajax execute="@form"
@@ -114,7 +116,7 @@
                     </h:commandButton>
 
                     <h:commandButton id="clear"
-                                     value="Очистить"
+                                     value="#{msg['button.clear']}"
                                      styleClass="button"
                                      action="#{dotBean.clear()}">
                         <f:ajax execute="@this"
@@ -130,27 +132,27 @@
                                  id="resultsTable">
 
                         <h:column>
-                            <f:facet name="header">X</f:facet>
+                            <f:facet name="header">#{msg['table.x']}</f:facet>
                             #{dot.x}
                         </h:column>
                         <h:column>
-                            <f:facet name="header">Y</f:facet>
+                            <f:facet name="header">#{msg['table.y']}</f:facet>
                             #{dot.y}
                         </h:column>
                         <h:column>
-                            <f:facet name="header">R</f:facet>
+                            <f:facet name="header">#{msg['table.r']}</f:facet>
                             #{dot.r}
                         </h:column>
                         <h:column>
-                            <f:facet name="header">Время</f:facet>
+                            <f:facet name="header">#{msg['table.time']}</f:facet>
                             <span class="time-cell">#{dot.time}</span>
                         </h:column>
                         <h:column>
-                            <f:facet name="header">Мкс</f:facet>
+                            <f:facet name="header">#{msg['table.micro']}</f:facet>
                             #{dot.scriptTime}
                         </h:column>
                         <h:column>
-                            <f:facet name="header">Результат</f:facet>
+                            <f:facet name="header">#{msg['table.result']}</f:facet>
                             #{dot.status}
                         </h:column>
 
@@ -169,7 +171,7 @@
         <h:inputHidden id="dots" value="#{dotBean.dotsJson}"/>
 
         <h:commandButton id="checkCanvas"
-                         value="Проверить"
+                         value="#{msg['button.check']}"
                          style="display:none"
                          action="#{dotBean.add()}">
             <f:ajax execute="hiddenForm"
@@ -198,25 +200,26 @@
 
     <h:outputScript>
         //<![CDATA[
-        function firstUpdateList() {
-            var dotsEl = document.getElementById("hiddenForm:dots");
-            var rEl = document.getElementById("hiddenForm:rValue");
+    function firstUpdateList() {
+        var dotsEl = document.getElementById("hiddenForm:dots");
+        var rEl = document.getElementById("hiddenForm:rValue");
+        const parseDotsError = "#{msg['js.parse.dots.error']}";
 
-            var json = (dotsEl && dotsEl.value) ? dotsEl.value : "[]";
-            var points;
-            try {
-                points = JSON.parse(json);
-            } catch (e) {
-                console.error("Ошибка парсинга dotsJson:", e);
-                points = [];
-            }
-
-            var r = (rEl && rEl.value) ? rEl.value : 2;
-            if (typeof draw === "function") {
-                draw(r, points);
-            }
+        var json = (dotsEl && dotsEl.value) ? dotsEl.value : "[]";
+        var points;
+        try {
+            points = JSON.parse(json);
+        } catch (e) {
+            console.error(parseDotsError, e);
+            points = [];
         }
-        //]]>
+
+        var r = (rEl && rEl.value) ? rEl.value : 2;
+        if (typeof draw === "function") {
+            draw(r, points);
+        }
+    }
+    //]]>
     </h:outputScript>
 
     <h:outputScript>
@@ -242,13 +245,14 @@
         //<![CDATA[
         function convertTimesToLocal() {
             const cells = document.querySelectorAll(".time-cell");
+            const parseDateError = "#{msg['js.parse.date.error']}";
             cells.forEach(cell => {
                 const iso = cell.textContent.trim();
                 if (!iso) return;
 
                 const d = new Date(iso);
                 if (isNaN(d.getTime())) {
-                    console.error("Невозможно распарсить дату:", iso);
+                    console.error(parseDateError, iso);
                     return;
                 }
 

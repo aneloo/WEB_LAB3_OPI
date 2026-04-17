@@ -2,20 +2,30 @@ package org.example.validation;
 
 import org.example.Dot;
 
+import java.util.ResourceBundle;
+
 public final class ValueValidator {
 
     private ValueValidator() {
 
     }
 
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("messages");
+
     public static void validate(Dot dot) {
+
         if (dot == null) {
-            throw new IllegalArgumentException("Точка не может быть null.");
+
+            throw new IllegalArgumentException(BUNDLE.getString("error.dot.null"));
+
         }
 
         validateX(dot.getX());
+
         validateY(dot.getY());
+
         validateR(dot.getR());
+
     }
 
     private static void validateX(double x) {
@@ -31,11 +41,16 @@ public final class ValueValidator {
     }
 
     private static void checkRange(double value, double min, double max, String fieldName) {
+
         if (value < min || value > max) {
+
             throw new IllegalArgumentException(
-                    "Поле " + fieldName + " должно быть в диапазоне [" + min + "; " + max + "]. " +
-                            "Получено: " + value
+
+                    String.format(BUNDLE.getString("error.field.range"), fieldName, min, max, value)
+
             );
+
         }
+
     }
 }
