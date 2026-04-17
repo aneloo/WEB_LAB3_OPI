@@ -1,0 +1,2 @@
+src/main/java/org/example/DotBean.java
+src/main/webapp/main.xhtml

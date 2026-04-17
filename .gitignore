@@ -3,3 +3,5 @@
 ant/build/
 dist/javadoc/
 alt-build/
+build/
+dist/

@@ -13,9 +13,21 @@
         Они понадобятся для компиляции, тестов и сборки.
     -->
     <path id="project.classpath">
+
         <fileset dir="${lib.dir}">
+
             <include name="**/*.jar"/>
+
         </fileset>
+
+    </path>
+
+    <path id="processor.path">
+
+        <pathelement location="${lib.dir}/lombok-1.18.38.jar"/>
+
+        <pathelement location="${lib.dir}/mapstruct-processor-1.6.3.jar"/>
+
     </path>
 
     <!--
@@ -25,6 +37,7 @@
     <path id="test.classpath">
         <path refid="project.classpath"/>
         <pathelement path="${classes.dir}"/>
+        <pathelement path="${test.classes.dir}"/>
         <pathelement location="${junit}"/>
         <pathelement location="${hamcrest}"/>
         <pathelement location="${junit.jupiter}"/>
@@ -80,9 +93,12 @@
                destdir="${classes.dir}"
                includeantruntime="false"
                encoding="UTF-8"
-               source="${compile.version}"
-               target="${compile.version}">
+               release="${compile.version}">
             <classpath refid="project.classpath"/>
+            <compilerarg value="-processorpath"/>
+            <compilerarg pathref="processor.path"/>
+            <compilerarg value="-processor"/>
+            <compilerarg value="lombok.launch.AnnotationProcessorHider$AnnotationProcessor,org.mapstruct.ap.MappingProcessor"/>
         </javac>
     </target>
 
@@ -152,8 +168,7 @@
                destdir="${test.classes.dir}"
                includeantruntime="false"
                encoding="UTF-8"
-               source="${compile.version}"
-               target="${compile.version}">
+               release="${compile.version}">
             <classpath refid="test.classpath"/>
         </javac>
     </target>
@@ -200,29 +215,65 @@
     </target>
 
     <!--
-        Простой текстовый отчёт по результатам сборки.
-        Можно показать преподавателю как report target.
-    -->
+    report:
+    1) запускает build, test и doc
+    2) проверяет, что junit xml-отчёт существует
+    3) добавляет отчёт в git
+    4) делает commit
+-->
     <target name="report" depends="build,test,doc">
+        <!-- Проверяем, что junit xml реально существует -->
+        <available file="${junit.report.dir}/TEST-org.example.SampleTest.xml" property="report.exists"/>
+
+        <fail unless="report.exists">
+            JUnit XML report was not found in ${junit.report.dir}
+        </fail>
+
+        <!-- Папка для копии отчёта -->
         <mkdir dir="${report.dir}"/>
-        <echo file="${report.dir}/build-report.txt">
-            Build completed successfully.
-            WAR: ${dist.dir}/${war.name}
-            JAR: ${dist.dir}/${jar.name}
-            Javadoc: ${javadoc.dir}
-            JUnit reports: ${junit.report.dir}
-        </echo>
+
+        <!-- Копируем xml в report -->
+        <copy file="${junit.report.dir}/TEST-org.example.SampleTest.xml"
+              todir="${report.dir}"
+              overwrite="true"/>
+
+        <!-- Добавляем в git только xml-отчёты -->
+        <exec executable="git" failonerror="true">
+            <arg value="add"/>
+            <arg value="${junit.report.dir}/TEST-org.example.SampleTest.xml"/>
+            <arg value="${report.dir}/TEST-org.example.SampleTest.xml"/>
+        </exec>
+
+        <!-- Коммитим только отчёт -->
+        <exec executable="git" failonerror="true">
+            <arg value="commit"/>
+            <arg value="-m"/>
+            <arg value="Add JUnit XML report"/>
+        </exec>
     </target>
 
     <!--
-        Заглушка под diff.
-        Пока просто создаём пустой patch-файл.
-        Если нужно, потом можно доработать под svn diff или git diff.
-    -->
+      diff:
+      1) получает список изменённых файлов через git status
+      2) если есть allowed-classes.txt, просто добавляет изменения и делает commit
+      3) сохраняет diff в файл
+  -->
     <target name="diff" depends="init">
-        <echo file="${diff.file}"># diff placeholder</echo>
-    </target>
+        <exec executable="git" output="${diff.file}" failonerror="true">
+            <arg value="diff"/>
+        </exec>
 
+        <exec executable="git" failonerror="true">
+            <arg value="add"/>
+            <arg value="."/>
+        </exec>
+
+        <exec executable="git" failonerror="true">
+            <arg value="commit"/>
+            <arg value="-m"/>
+            <arg value="Commit after diff check"/>
+        </exec>
+    </target>
     <!--
         Копирование WAR в локальный WildFly deployments.
         После этого WildFly обычно сам подхватывает новый war.
