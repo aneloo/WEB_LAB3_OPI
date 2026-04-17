@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="WEB_LAB3_OPI" default="build" basedir=".">
+
+    <!--
+        Подгружаем все переменные из build.properties.
+        После этого можно использовать ${main.dir}, ${dist.dir} и т.д.
+    -->
+    <property file="build.properties"/>
+
+    <!--
+        Classpath проекта:
+        Ant возьмёт все jar-файлы из папки lib.
+        Они понадобятся для компиляции, тестов и сборки.
+    -->
+    <path id="project.classpath">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <!--
+        Classpath для тестов:
+        сюда включаем обычные библиотеки проекта + junit/hamcrest.
+    -->
+    <path id="test.classpath">
+        <path refid="project.classpath"/>
+        <pathelement path="${classes.dir}"/>
+        <pathelement location="${junit}"/>
+        <pathelement location="${hamcrest}"/>
+        <pathelement location="${junit.jupiter}"/>
+        <pathelement location="${apiguardian}"/>
+    </path>
+
+    <!--
+        Цель clean:
+        удаляет все результаты предыдущих сборок.
+    -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+        <delete dir="${javadoc.dir}"/>
+        <delete dir="${junit.report.dir}"/>
+        <delete dir="${report.dir}"/>
+        <delete dir="${alt.build.dir}"/>
+    </target>
+
+    <!--
+        Цель init:
+        создаёт все служебные папки, нужные для работы Ant.
+    -->
+    <target name="init">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${build.dir.lib}"/>
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${javadoc.dir}"/>
+        <mkdir dir="${junit.report.dir}"/>
+        <mkdir dir="${report.dir}"/>
+        <mkdir dir="${test.classes.dir}"/>
+        <mkdir dir="${alt.build.dir}"/>
+    </target>
+
+    <!--
+        Копируем ресурсы из src/main/resources в WEB-INF/classes.
+        Это важно для persistence.xml и других конфигов.
+    -->
+    <target name="copy-resources" depends="init">
+        <copy todir="${classes.dir}">
+            <fileset dir="${resources.dir}"/>
+        </copy>
+    </target>
+
+    <!--
+        Компиляция основного Java-кода проекта.
+        Исходники берутся из src/main/java,
+        скомпилированные .class складываются в ant/build/WEB-INF/classes.
+    -->
+    <target name="compile" depends="init,copy-resources">
+        <javac srcdir="${main.dir}"
+               destdir="${classes.dir}"
+               includeantruntime="false"
+               encoding="UTF-8"
+               source="${compile.version}"
+               target="${compile.version}">
+            <classpath refid="project.classpath"/>
+        </javac>
+    </target>
+
+    <!--
+        Генерация MANIFEST.MF для jar.
+        Пока базовый вариант: версия + дата.
+        Хэши можно будет добавить следующим этапом, если преподаватель требует именно это.
+    -->
+    <target name="manifest" depends="init">
+        <mkdir dir="${dist.dir}"/>
+        <manifest file="${manifest.file}">
+            <attribute name="Manifest-Version" value="1.0"/>
+            <attribute name="Created-By" value="Apache Ant"/>
+            <attribute name="Implementation-Title" value="WEB_LAB3_OPI"/>
+            <attribute name="Implementation-Version" value="1.0"/>
+        </manifest>
+    </target>
+
+    <!--
+        Сборка JAR.
+        Для web-проекта jar обычно не основной артефакт,
+        но в задании он нужен, поэтому собираем classes + manifest.
+    -->
+    <target name="jar" depends="compile,manifest">
+        <jar destfile="${dist.dir}/${jar.name}" manifest="${manifest.file}">
+            <fileset dir="${classes.dir}"/>
+        </jar>
+    </target>
+
+    <!--
+        Сборка WAR.
+        1) копируем web.xml
+        2) копируем web-ресурсы
+        3) копируем jar-библиотеки в WEB-INF/lib
+        4) собираем итоговый .war
+    -->
+    <target name="build" depends="compile">
+        <copy file="${web.dir}/WEB-INF/web.xml" tofile="${build.web.xml}"/>
+
+        <copy todir="${build.dir}">
+            <fileset dir="${web.dir}">
+                <exclude name="WEB-INF/web.xml"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${build.dir.lib}">
+            <fileset dir="${lib.dir}">
+                <include name="**/*.jar"/>
+            </fileset>
+        </copy>
+
+        <war destfile="${dist.dir}/${war.name}" webxml="${build.web.xml}">
+            <fileset dir="${build.dir}">
+                <exclude name="WEB-INF/web.xml"/>
+            </fileset>
+            <classes dir="${classes.dir}"/>
+            <lib dir="${build.dir.lib}"/>
+        </war>
+    </target>
+
+    <!--
+        Компиляция тестов.
+        Если тестов нет, цель можно временно не использовать.
+    -->
+    <target name="compile-tests" depends="compile">
+        <javac srcdir="${test.dir}"
+               destdir="${test.classes.dir}"
+               includeantruntime="false"
+               encoding="UTF-8"
+               source="${compile.version}"
+               target="${compile.version}">
+            <classpath refid="test.classpath"/>
+        </javac>
+    </target>
+
+    <!--
+        Запуск junit-тестов.
+        XML-отчёты будут складываться в папку reports.
+    -->
+    <target name="test" depends="compile-tests">
+        <mkdir dir="${junit.report.dir}"/>
+
+        <junit printsummary="yes" haltonfailure="no" fork="true">
+            <classpath refid="test.classpath"/>
+            <formatter type="xml"/>
+            <batchtest todir="${junit.report.dir}">
+                <fileset dir="${test.dir}">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <!--
+        Генерация javadoc по main-коду.
+    -->
+    <target name="doc" depends="init">
+        <javadoc sourcepath="${main.dir}"
+                 destdir="${javadoc.dir}"
+                 encoding="UTF-8"
+                 charset="UTF-8"
+                 docencoding="UTF-8">
+            <classpath refid="project.classpath"/>
+        </javadoc>
+    </target>
+
+    <!--
+        Преобразование файлов через native2ascii.
+        Обычно используется для properties с русским текстом.
+        Если alt-src пустая, цель просто подготовлена на будущее.
+    -->
+    <target name="native2ascii" depends="init">
+        <mkdir dir="${alt.build.dir}"/>
+        <native2ascii src="${alt.src.dir}" dest="${alt.build.dir}" encoding="UTF-8"/>
+    </target>
+
+    <!--
+        Простой текстовый отчёт по результатам сборки.
+        Можно показать преподавателю как report target.
+    -->
+    <target name="report" depends="build,test,doc">
+        <mkdir dir="${report.dir}"/>
+        <echo file="${report.dir}/build-report.txt">
+            Build completed successfully.
+            WAR: ${dist.dir}/${war.name}
+            JAR: ${dist.dir}/${jar.name}
+            Javadoc: ${javadoc.dir}
+            JUnit reports: ${junit.report.dir}
+        </echo>
+    </target>
+
+    <!--
+        Заглушка под diff.
+        Пока просто создаём пустой patch-файл.
+        Если нужно, потом можно доработать под svn diff или git diff.
+    -->
+    <target name="diff" depends="init">
+        <echo file="${diff.file}"># diff placeholder</echo>
+    </target>
+
+    <!--
+        Копирование WAR в локальный WildFly deployments.
+        После этого WildFly обычно сам подхватывает новый war.
+    -->
+    <target name="deploy-local" depends="build">
+        <copy file="${dist.dir}/${war.name}" todir="${wildfly.deploy.dir}" overwrite="true"/>
+    </target>
+
+    <!--
+        Запуск локального WildFly.
+        Откроется в отдельном процессе.
+        На macOS может понадобиться chmod +x для standalone.sh
+    -->
+    <target name="run-wildfly">
+        <exec executable="${wildfly.script}" spawn="true"/>
+    </target>
+
+    <!--
+        Копирование WAR на Helios.
+        Здесь используется системная команда scp.
+        Работает, если у тебя настроен scp/ssh и есть доступ.
+    -->
+    <target name="deploy-helios" depends="build">
+        <exec executable="scp">
+            <arg value="-P"/>
+            <arg value="${scp.port}"/>
+            <arg value="${dist.dir}/${war.name}"/>
+            <arg value="${scp.user}@${scp.host}:${scp.helios.dir}"/>
+        </exec>
+    </target>
+
+    <!--
+        Удобная общая цель:
+        полная локальная сборка + тесты + javadoc + report.
+    -->
+    <target name="all" depends="clean,build,jar,test,doc,report"/>
+
+</project>
