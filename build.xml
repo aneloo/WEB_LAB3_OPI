@@ -252,17 +252,51 @@
         </exec>
     </target>
 
-    <!--
-      diff:
-      1) получает список изменённых файлов через git status
-      2) если есть allowed-classes.txt, просто добавляет изменения и делает commit
-      3) сохраняет diff в файл
-  -->
-    <target name="diff" depends="init">
+    <!-- ===== DIFF ===== -->
+    <target name="diff">
+        <echo message="***** DIFF STARTED *****"/>
+
+        <!-- Читаем шаблоны запрещённых файлов -->
+        <loadproperties srcFile="${ignore.file}"/>
+
+        <!-- Получаем список изменённых файлов -->
+        <exec executable="git" outputproperty="git.status" failonerror="true">
+            <arg value="status"/>
+            <arg value="--porcelain"/>
+        </exec>
+
+        <!-- Фильтруем только запрещённые изменения -->
+        <loadresource property="forbidden.changes">
+            <string value="${git.status}"/>
+            <filterchain>
+                <linecontainsregexp>
+                    <regexp pattern="${ignored.patterns}"/>
+                </linecontainsregexp>
+            </filterchain>
+        </loadresource>
+
+        <!-- Проверяем, есть ли запрещённые изменения -->
+        <condition property="has.forbidden.changes">
+            <and>
+                <isset property="forbidden.changes"/>
+                <not>
+                    <equals arg1="${forbidden.changes}" arg2=""/>
+                </not>
+            </and>
+        </condition>
+
+        <!-- Если запрещённых изменений нет — сохраняем diff -->
         <exec executable="git" output="${diff.file}" failonerror="true">
             <arg value="diff"/>
         </exec>
 
+        <antcall target="commit-if-clean"/>
+        <antcall target="abort-if-dirty"/>
+
+        <echo message="***** DIFF COMPLETED *****"/>
+    </target>
+
+    <target name="commit-if-clean" unless="has.forbidden.changes">
         <exec executable="git" failonerror="true">
             <arg value="add"/>
             <arg value="."/>
@@ -271,8 +305,14 @@
         <exec executable="git" failonerror="true">
             <arg value="commit"/>
             <arg value="-m"/>
-            <arg value="Commit after diff check"/>
+            <arg value="Auto-commit: safe changes"/>
         </exec>
+
+        <echo message="Коммит выполнен успешно"/>
+    </target>
+
+    <target name="abort-if-dirty" if="has.forbidden.changes">
+        <fail message="Обнаружены изменения в запрещённых файлах. Коммит отменён."/>
     </target>
     <!--
         Копирование WAR в локальный WildFly deployments.
