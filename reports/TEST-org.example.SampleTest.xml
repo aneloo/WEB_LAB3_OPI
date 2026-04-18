@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite errors="0" failures="0" hostname="MacBook-Pro-Anna.local" name="org.example.SampleTest" skipped="0" tests="1" time="0.032" timestamp="2026-04-17T16:21:41">
+<testsuite errors="0" failures="0" hostname="MacBook-Pro-Anna.local" name="org.example.SampleTest" skipped="0" tests="1" time="0.031" timestamp="2026-04-18T09:34:49">
   <properties>
     <property name="ant.library.dir" value="/opt/homebrew/Cellar/ant/1.10.17/libexec/lib" />
     <property name="wildfly.script" value="/Users/volnova/Downloads/wildfly-39.0.0.Final/bin/standalone.sh" />
@@ -10,7 +10,7 @@
     <property name="java.vendor.url" value="https://github.com/Homebrew/homebrew-core/issues" />
     <property name="resources.dir" value="src/main/resources" />
     <property name="sun.boot.library.path" value="/opt/homebrew/Cellar/openjdk/25.0.2/libexec/openjdk.jdk/Contents/Home/lib" />
-    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner org.example.SampleTest skipNonTests=false filtertrace=true haltOnError=false haltOnFailure=false formatter=org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter showoutput=false outputtoformatters=true logfailedtests=true threadid=0 logtestlistenerevents=false formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,/Users/volnova/WEB_LAB3_OPI/reports/TEST-org.example.SampleTest.xml crashfile=/Users/volnova/WEB_LAB3_OPI/junitvmwatcher3077778469167888393.properties propsfile=/Users/volnova/WEB_LAB3_OPI/junit5302755481574033552.properties" />
+    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner org.example.SampleTest skipNonTests=false filtertrace=true haltOnError=false haltOnFailure=false formatter=org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter showoutput=false outputtoformatters=true logfailedtests=true threadid=0 logtestlistenerevents=false formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,/Users/volnova/WEB_LAB3_OPI/reports/TEST-org.example.SampleTest.xml crashfile=/Users/volnova/WEB_LAB3_OPI/junitvmwatcher1205024916787574740.properties propsfile=/Users/volnova/WEB_LAB3_OPI/junit10024070721089334213.properties" />
     <property name="test.classes.dir" value="ant/build/test/classes" />
     <property name="jdk.debug" value="release" />
     <property name="java.specification.vendor" value="Oracle Corporation" />
@@ -52,7 +52,7 @@
     <property name="ant.file.type" value="file" />
     <property name="scp.port" value="2222" />
     <property name="junit.report.dir" value="reports" />
-    <property name="java.class.path" value="/Users/volnova/WEB_LAB3_OPI/lib/hamcrest-core-1.3.jar:/Users/volnova/WEB_LAB3_OPI/lib/jakarta.annotation-api-3.0.0.jar:/Users/volnova/WEB_LAB3_OPI/lib/jakarta.enterprise.cdi-api-4.1.0.jar:/Users/volnova/WEB_LAB3_OPI/lib/jakarta.inject-api-2.0.1.jar:/Users/volnova/WEB_LAB3_OPI/lib/jakarta.persistence-api-3.2.0.jar:/Users/volnova/WEB_LAB3_OPI/lib/junit-4.13.2.jar:/Users/volnova/WEB_LAB3_OPI/lib/lombok-1.18.38.jar:/Users/volnova/WEB_LAB3_OPI/lib/mapstruct-1.6.3.jar:/Users/volnova/WEB_LAB3_OPI/lib/mapstruct-processor-1.6.3.jar:/Users/volnova/WEB_LAB3_OPI/ant/build/WEB-INF/classes:/Users/volnova/WEB_LAB3_OPI/ant/build/test/classes:/opt/homebrew/Cellar/ant/1.10.17/libexec/lib/ant-launcher.jar:/opt/homebrew/Cellar/ant/1.10.17/libexec/lib/ant.jar:/opt/homebrew/Cellar/ant/1.10.17/libexec/lib/ant-junit.jar:/opt/homebrew/Cellar/ant/1.10.17/libexec/lib/ant-junit4.jar" />
+    <property name="java.class.path" value="/Users/volnova/WEB_LAB3_OPI/lib/eclipselink-4.0.8.jar:/Users/volnova/WEB_LAB3_OPI/lib/hamcrest-core-1.3.jar:/Users/volnova/WEB_LAB3_OPI/lib/jakarta.annotation-api-3.0.0.jar:/Users/volnova/WEB_LAB3_OPI/lib/jakarta.enterprise.cdi-api-4.1.0.jar:/Users/volnova/WEB_LAB3_OPI/lib/jakarta.inject-api-2.0.1.jar:/Users/volnova/WEB_LAB3_OPI/lib/jakarta.persistence-api-3.2.0.jar:/Users/volnova/WEB_LAB3_OPI/lib/junit-4.13.2.jar:/Users/volnova/WEB_LAB3_OPI/lib/lombok-1.18.38.jar:/Users/volnova/WEB_LAB3_OPI/lib/mapstruct-1.6.3.jar:/Users/volnova/WEB_LAB3_OPI/lib/mapstruct-processor-1.6.3.jar:/Users/volnova/WEB_LAB3_OPI/lib/primefaces-13.0.10-jakarta.jar:/Users/volnova/WEB_LAB3_OPI/ant/build/WEB-INF/classes:/Users/volnova/WEB_LAB3_OPI/ant/build/test/classes:/opt/homebrew/Cellar/ant/1.10.17/libexec/lib/ant-launcher.jar:/opt/homebrew/Cellar/ant/1.10.17/libexec/lib/ant.jar:/opt/homebrew/Cellar/ant/1.10.17/libexec/lib/ant-junit.jar:/opt/homebrew/Cellar/ant/1.10.17/libexec/lib/ant-junit4.jar" />
     <property name="java.vm.vendor" value="Homebrew" />
     <property name="ant.file.WEB_LAB3_OPI" value="/Users/volnova/WEB_LAB3_OPI/build.xml" />
     <property name="os.name" value="Mac OS X" />
@@ -87,7 +87,7 @@
     <property name="alt.build.dir" value="alt-build" />
     <property name="ant.core.lib" value="/opt/homebrew/Cellar/ant/1.10.17/libexec/lib/ant.jar" />
     <property name="java.vendor.url.bug" value="https://github.com/Homebrew/homebrew-core/issues" />
-    <property name="ignore.file" value="svn-ignore.properties" />
+    <property name="ignore.file" value="git-ignore.properties" />
     <property name="user.dir" value="/Users/volnova/WEB_LAB3_OPI" />
     <property name="os.arch" value="aarch64" />
     <property name="build.dir.lib" value="ant/build/WEB-INF/lib" />
