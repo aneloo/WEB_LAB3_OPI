@@ -38,11 +38,18 @@
     <target name="clean">
         <delete dir="${build.dir}"/>
         <delete dir="${dist.dir}"/>
-        <delete dir="${javadoc.dir}"/>
         <delete dir="${junit.report.dir}"/>
         <delete dir="${report.dir}"/>
         <delete dir="${alt.build.dir}"/>
         <delete file="${diff.file}"/>
+
+
+        <delete>
+            <fileset dir="${main.dir}">
+                <include name="**/*.md5"/>
+                <include name="**/*.sha1"/>
+            </fileset>
+        </delete>
     </target>
 
 
@@ -80,7 +87,6 @@
         </javac>
     </target>
 
-
     <target name="manifest" depends="init">
         <mkdir dir="${dist.dir}"/>
         <manifest file="${manifest.file}">
@@ -92,9 +98,56 @@
     </target>
 
 
+    <target name="doc-manifest" depends="init">
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${checksums.dir}"/>
+
+        <checksum todir="${checksums.dir}" fileext=".md5" algorithm="MD5">
+            <fileset dir="${main.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+        </checksum>
+
+        <checksum todir="${checksums.dir}" fileext=".sha1" algorithm="SHA-1">
+            <fileset dir="${main.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+        </checksum>
+
+        <pathconvert property="project.md5.list" pathsep=" | ">
+            <fileset dir="${checksums.dir}">
+                <include name="**/*.md5"/>
+            </fileset>
+            <mapper type="flatten"/>
+        </pathconvert>
+
+        <pathconvert property="project.sha1.list" pathsep=" | ">
+            <fileset dir="${checksums.dir}">
+                <include name="**/*.sha1"/>
+            </fileset>
+            <mapper type="flatten"/>
+        </pathconvert>
+
+        <manifest file="${doc.manifest.file}">
+            <attribute name="Manifest-Version" value="1.0"/>
+            <attribute name="Created-By" value="Apache Ant"/>
+            <attribute name="Implementation-Title" value="WEB_LAB3_OPI"/>
+            <attribute name="Implementation-Version" value="1.0"/>
+            <attribute name="Project-MD5" value="${project.md5.list}"/>
+            <attribute name="Project-SHA1" value="${project.sha1.list}"/>
+        </manifest>
+    </target>
+
     <target name="jar" depends="compile,manifest">
         <jar destfile="${dist.dir}/${jar.name}" manifest="${manifest.file}">
             <fileset dir="${classes.dir}"/>
+        </jar>
+    </target>
+
+    <target name="doc-jar" depends="compile,doc-gen,doc-manifest">
+        <jar destfile="${dist.dir}/${jar.name}" manifest="${doc.manifest.file}">
+            <fileset dir="${classes.dir}"/>
+            <zipfileset dir="${javadoc.dir}" prefix="javadoc"/>
         </jar>
     </target>
 
@@ -150,7 +203,7 @@
     </target>
 
 
-    <target name="doc" depends="init">
+    <target name="doc-gen" depends="init">
         <javadoc sourcepath="${main.dir}"
                  destdir="${javadoc.dir}"
                  encoding="UTF-8"
@@ -159,6 +212,8 @@
             <classpath refid="project.classpath"/>
         </javadoc>
     </target>
+
+    <target name="doc" depends="doc-gen,doc-manifest,doc-jar"/>
 
 
     <target name="native2ascii" depends="init">
@@ -201,9 +256,7 @@
 
     <target name="diff">
 
-
         <loadproperties srcFile="${ignore.file}"/>
-
 
         <exec executable="git" outputproperty="git.status" failonerror="true">
             <arg value="status"/>
