@@ -1,28 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="WEB_LAB3_OPI" default="build" basedir=".">
 
+<project name="WEB_LAB3_OPI" default="build" basedir=".">
 
     <property file="build.properties"/>
 
-
     <path id="project.classpath">
-
         <fileset dir="${lib.dir}">
-
             <include name="**/*.jar"/>
-
         </fileset>
-
     </path>
 
     <path id="processor.path">
-
         <pathelement location="${lib.dir}/lombok-1.18.38.jar"/>
-
         <pathelement location="${lib.dir}/mapstruct-processor-1.6.3.jar"/>
-
     </path>
-
 
     <path id="test.classpath">
         <path refid="project.classpath"/>
@@ -34,7 +25,6 @@
         <pathelement location="${apiguardian}"/>
     </path>
 
-
     <target name="clean">
         <delete dir="${build.dir}"/>
         <delete dir="${dist.dir}"/>
@@ -43,7 +33,6 @@
         <delete dir="${alt.build.dir}"/>
         <delete file="${diff.file}"/>
 
-
         <delete>
             <fileset dir="${main.dir}">
                 <include name="**/*.md5"/>
@@ -51,7 +40,6 @@
             </fileset>
         </delete>
     </target>
-
 
     <target name="init">
         <mkdir dir="${build.dir}"/>
@@ -65,13 +53,11 @@
         <mkdir dir="${alt.build.dir}"/>
     </target>
 
-
     <target name="copy-resources" depends="init">
         <copy todir="${classes.dir}">
             <fileset dir="${resources.dir}"/>
         </copy>
     </target>
-
 
     <target name="compile" depends="init,copy-resources">
         <javac srcdir="${main.dir}"
@@ -89,6 +75,7 @@
 
     <target name="manifest" depends="init">
         <mkdir dir="${dist.dir}"/>
+
         <manifest file="${manifest.file}">
             <attribute name="Manifest-Version" value="1.0"/>
             <attribute name="Created-By" value="Apache Ant"/>
@@ -96,7 +83,6 @@
             <attribute name="Implementation-Version" value="1.0"/>
         </manifest>
     </target>
-
 
     <target name="doc-manifest" depends="init">
         <mkdir dir="${dist.dir}"/>
@@ -151,7 +137,6 @@
         </jar>
     </target>
 
-
     <target name="build" depends="jar">
         <copy file="${web.dir}/WEB-INF/web.xml" tofile="${build.web.xml}"/>
 
@@ -176,7 +161,6 @@
         </war>
     </target>
 
-
     <target name="compile-tests" depends="compile">
         <javac srcdir="${test.dir}"
                destdir="${test.classes.dir}"
@@ -186,7 +170,6 @@
             <classpath refid="test.classpath"/>
         </javac>
     </target>
-
 
     <target name="test" depends="compile-tests">
         <mkdir dir="${junit.report.dir}"/>
@@ -202,7 +185,6 @@
         </junit>
     </target>
 
-
     <target name="doc-gen" depends="init">
         <javadoc sourcepath="${main.dir}"
                  destdir="${javadoc.dir}"
@@ -215,36 +197,30 @@
 
     <target name="doc" depends="doc-gen,doc-manifest,doc-jar"/>
 
-
     <target name="native2ascii" depends="init">
         <mkdir dir="${alt.build.dir}"/>
         <native2ascii src="${alt.src.dir}" dest="${alt.build.dir}" encoding="UTF-8"/>
     </target>
 
-
     <target name="report" depends="build,test">
-
-        <available file="${junit.report.dir}/TEST-org.example.SampleTest.xml" property="report.exists"/>
+        <available file="${junit.report.dir}/TEST-org.example.ArgumentValidatorTest.xml"
+                   property="report.exists"/>
 
         <fail unless="report.exists">
             JUnit XML report was not found in ${junit.report.dir}
         </fail>
 
-
         <mkdir dir="${report.dir}"/>
 
-
-        <copy file="${junit.report.dir}/TEST-org.example.SampleTest.xml"
+        <copy file="${junit.report.dir}/TEST-org.example.ArgumentValidatorTest.xml"
               todir="${report.dir}"
               overwrite="true"/>
 
-
         <exec executable="git" failonerror="true">
             <arg value="add"/>
-            <arg value="${junit.report.dir}/TEST-org.example.SampleTest.xml"/>
-            <arg value="${report.dir}/TEST-org.example.SampleTest.xml"/>
+            <arg value="${junit.report.dir}/TEST-org.example.ArgumentValidatorTest.xml"/>
+            <arg value="${report.dir}/TEST-org.example.ArgumentValidatorTest.xml"/>
         </exec>
-
 
         <exec executable="git" failonerror="true">
             <arg value="commit"/>
@@ -253,16 +229,13 @@
         </exec>
     </target>
 
-
     <target name="diff">
-
         <loadproperties srcFile="${ignore.file}"/>
 
         <exec executable="git" outputproperty="git.status" failonerror="true">
             <arg value="status"/>
             <arg value="--porcelain"/>
         </exec>
-
 
         <loadresource property="forbidden.changes">
             <string value="${git.status}"/>
@@ -273,7 +246,6 @@
             </filterchain>
         </loadresource>
 
-
         <condition property="has.forbidden.changes">
             <and>
                 <isset property="forbidden.changes"/>
@@ -283,15 +255,12 @@
             </and>
         </condition>
 
-
         <exec executable="git" output="${diff.file}" failonerror="true">
             <arg value="diff"/>
         </exec>
 
         <antcall target="commit-if-clean"/>
         <antcall target="abort-if-dirty"/>
-
-
     </target>
 
     <target name="commit-if-clean" unless="has.forbidden.changes">
@@ -311,6 +280,41 @@
 
     <target name="abort-if-dirty" if="has.forbidden.changes">
         <fail message="Обнаружены изменения в запрещённых файлах. Коммит отменён."/>
+    </target>
+
+    <target name="start">
+        <exec executable="docker" failonerror="true">
+            <arg value="start"/>
+            <arg value="lab-postgres"/>
+        </exec>
+    </target>
+
+    <target name="check">
+        <exec executable="docker" failonerror="true">
+            <arg value="ps"/>
+        </exec>
+    </target>
+
+    <target name="deploy" depends="build">
+        <copy file="${dist.dir}/${war.name}"
+              todir="${wildfly.deploy.dir}"
+              overwrite="true"/>
+    </target>
+
+    <target name="run">
+        <exec executable="${wildfly.script}" spawn="true"/>
+    </target>
+
+    <target name="open" depends="start,check,run">
+        <sleep seconds="5"/>
+
+        <antcall target="deploy"/>
+
+        <sleep seconds="5"/>
+
+        <exec executable="open">
+            <arg value="http://localhost:8080/WEB_LAB3_OPI/"/>
+        </exec>
     </target>
 
 </project>

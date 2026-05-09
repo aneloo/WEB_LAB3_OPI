@@ -31,6 +31,8 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.20")
 
 
+    testImplementation("junit:junit:4.13.2")
+
 
     implementation ("org.mapstruct:mapstruct:1.6.3")
     annotationProcessor ("org.mapstruct:mapstruct-processor:1.6.3")
