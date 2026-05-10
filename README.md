@@ -1,11 +1,7 @@
 # WEB_LAB3_OPI
 
-Лабораторная работа №3  
+Лабораторная работа №3 по дисциплине "ОПИ"
 Вариант: **234439**
-
-## Назначение
-
-Ant-сценарий для сборки проекта: компиляция, упаковка, тестирование, документация, отчёты, проверка Git-состояния и локальный запуск через Docker/WildFly.
 
 ## Условие
 
@@ -50,13 +46,6 @@ ant/build/WEB-INF/classes/
 ```text
 dist/MANIFEST.MF
 ```
-
-Manifest содержит:
-
-- `Manifest-Version`
-- `Created-By`
-- `Implementation-Title`
-- `Implementation-Version`
 
 Создаваемые архивы:
 
@@ -180,12 +169,6 @@ reports/TEST-org.example.ArgumentValidatorTest.xml
 report/TEST-org.example.ArgumentValidatorTest.xml
 ```
 
-Добавляет оба XML-отчёта в Git и создаёт commit:
-
-```text
-Add JUnit XML report
-```
-
 ---
 
 ### `diff`
@@ -204,12 +187,7 @@ git-ignore.properties
 failed_revision_diff.patch
 ```
 
-Если запрещённых изменений нет, выполняет commit:
-
-```text
-Auto-commit: safe changes
-```
-
+Если запрещённых изменений нет, выполняет commit.
 Если запрещённые изменения найдены, завершает выполнение ошибкой.
 
 ## Дополнительные targets
